@@ -1,11 +1,24 @@
-# Track my usage of electricity
+# Track My Usage of Electricity
 
 ## Background
 
-I purchased a EMU-2 home energy display from Puget Sound Energy (PSE).  The EMU-2 unit is manufactured by Rainforest Automation.  PSE intended customers to use the EMU-2 to ascertain how much electricity each appliance uses in an effort to reduce electricity usage.  A customer would put batteries in the unit, walk around and turn on and off various appliances to see the usage.  My intent from the start was to track the kWh electricity usage over time.  I can see what hours of the day have the most usage and I can track the daily usage as I progress through the monthly billing cycle.
+I purchased an EMU-2 home energy display from Puget Sound Energy (PSE).  The EMU-2 unit is manufactured by Rainforest Automation.  PSE intended customers to use the EMU-2 to ascertain how much electricity each appliance uses in an effort to reduce electricity usage.  A customer would put batteries in the unit, walk around and turn on and off various appliances to see the usage.  My intent from the start was to track the kWh electricity usage over time.  I can see what hours of the day have the most usage and I can track the daily usage as I progress through the monthly billing cycle.
 
-## Automating Data Collection
+## Scripting Electricity Data Collection
 
-I searched for a way to automate or script the collection of data. I found the emu_power Python library that automated the interface between Python and the EMU-2 serial device.  The same Python script can run on Linux and Windows computers with the only difference being the device name.  Windows 11 has a USB-Serial emulation port.
+I searched for a way to script the collection of data. I found the emu_power Python library that automated the interface between Python and the EMU-2 serial device.  The same Python script can run on Linux and Windows computers with the only difference being the device name.  Windows 11 has a USB-Serial emulation port.
+
+emu_power is based on the XML spec for the Rainforest RAVEN API.  The spec is similar to the API that the EMU-2 device uses.
+
+Windows Port: COM5
+Linux Port: /dev/ttyACM0
 
 emu-power 1.51: https://pypi.org/project/emu-power/
+
+## Python Script Design
+
+### Overview
+
+The EMU-2 reports the instaneous electricity usage when queried.  It returns a value in Kilowatt Hours (kWh) as if that amount was used for a full hour.  I wanted to get a total of electricity used for each whole hour.  I decided to take a reading every minute and add that value to an accumulator.  At the end of the hour, the script divides that amount by the number of readings which is usually 60.  This value is written to a tab-seperated file.  The values are written within an infinite loop.  The script must be externally stopped if desired.
+
+I soon realized that I needed to put the values into a database and I could use my SQL skills to query the results in different ways.  The next step was to setup a MySQL database to receive the values.
