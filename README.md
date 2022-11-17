@@ -122,7 +122,7 @@ order by
 
 ## Windows 11 Hardware View
 
-(./WinDev01.jpg)
-(./WinDev02.jpg)
-(./WinDev03.jpg)
-(./WinDev04.jpg)
+!(./WinDev01.jpg)
+!(./WinDev02.jpg)
+!(./WinDev03.jpg)
+!(./WinDev04.jpg)
