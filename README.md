@@ -10,8 +10,10 @@ I searched for a way to script the collection of data. I found the emu_power Pyt
 
 emu_power is based on the XML spec for the Rainforest RAVEN API.  The spec is similar to the API that the EMU-2 device uses.
 
+```
 Windows Port: COM5
 Linux Port: /dev/ttyACM0
+```
 
 emu-power 1.51: https://pypi.org/project/emu-power/
 
@@ -21,4 +23,16 @@ emu-power 1.51: https://pypi.org/project/emu-power/
 
 The EMU-2 reports the instaneous electricity usage when queried.  It returns a value in Kilowatt Hours (kWh) as if that amount was used for a full hour.  I wanted to get a total of electricity used for each whole hour.  I decided to take a reading every minute and add that value to an accumulator.  At the end of the hour, the script divides that amount by the number of readings which is usually 60.  This value is written to a tab-seperated file.  The values are written within an infinite loop.  The script must be externally stopped if desired.
 
+### Database
+
 I soon realized that I needed to put the values into a database and I could use my SQL skills to query the results in different ways.  The next step was to setup a MySQL database to receive the values.
+
+* def insertDB(myDate, myHour, mykWh): A self-contained function to insert a record into the database.
+* class MySignalHandler:
+  * def setup(self,thePID,theAR): Initialize signal handler and the variables PID and AR
+  * def catch(self, signalNumber, frame): Get the current time, set a message and print the message; remove file indicating the script is running; flush STDOUT and STDERR; call os.kill() to kill itself.
+  
+The script has a main() function that contains the a lot of the code.  main() is used to ensure that the script is run as top-level script.
+
+* if __name__ == '__main__':
+blah blah
