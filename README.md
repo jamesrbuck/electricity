@@ -17,13 +17,13 @@ Linux Port: /dev/ttyACM0
 
 emu-power 1.51: https://pypi.org/project/emu-power/
 
-## Python Script Design
+## Design
 
 ### Overview
 
 The EMU-2 reports the instaneous electricity usage when queried.  It returns a value in Kilowatt Hours (kWh) as if that amount was used for a full hour.  I wanted to get a total of electricity used for each whole hour.  I decided to take a reading every minute and add that value to an accumulator.  At the end of the hour, the script divides that amount by the number of readings which is usually 60.  This value is written to a tab-seperated file.  The values are written within an infinite loop.  The script must be externally stopped if desired.
 
-### Database
+### Logic
 
 I soon realized that I needed to put the values into a database and I could use my SQL skills to query the results in different ways.  The next step was to setup a MySQL database to receive the values.
 
@@ -56,4 +56,66 @@ The script has a main() function that contains the a lot of the code.  main() is
     * Check if it's Midnight and print summary if it is.  Note that this code is obsolete since we're also inserting values into the database.
     * sleep 60 seconds
     
-etc
+
+### Database
+
+**DB_setup.sql**
+
+```
+create database pse
+
+use pse;
+
+select database();
+show tables;
+
+
+CREATE TABLE `pse`.`usage_e` (
+  `ID` INT NOT NULL AUTO_INCREMENT,
+  `UDate` DATE NOT NULL,
+  `UTime` TIME NOT NULL,
+  `kWh` DECIMAL(7,3) NULL DEFAULT 0.0,
+  PRIMARY KEY (`ID`),
+  UNIQUE INDEX `I_USAGE_E_UNIQUE` (`ID` ASC) VISIBLE)
+COMMENT = 'Puget Sound Energy Electricity Usage for The Ponderosa';
+```
+
+**DB_hourly.sql**
+
+```
+use pse;
+
+select
+   UDate,
+   substring(UTime,1,5) as the_hour,
+   kWh
+from
+   usage_e
+order by
+   ID desc;
+```
+
+**DB_daily.sql**
+
+```
+use pse;
+
+select
+   UDate as Date
+   ,ELT(dayofweek(UDate),'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday') as DoW
+   ,round(sum(kWh)/count(kWh),3) as kWh_Hr_avg
+   ,count(kWh) as hours
+   ,sum(kWh) as kWh_day_total
+   ,round(((sum(kWh)/count(kWh))*24*0.105),2) as kWh_day_total_cost
+   ,round((sum(kWh)/count(kWh))*24,3) as kWh_24hr_est
+from
+   usage_e
+where
+   UDate >='2022-11-05' and
+   UDate <='2022-12-04'
+group by
+   UDate
+order by
+   UDate
+;
+```
