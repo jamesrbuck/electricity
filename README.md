@@ -122,7 +122,7 @@ order by
 
 ## Windows 11 Hardware View
 
-!(./WinDev01.jpg)
-!(./WinDev02.jpg)
-!(./WinDev03.jpg)
-!(./WinDev04.jpg)
+![Device Manager](./WinDev01.jpg)
+![Properties General](./WinDev02.jpg)
+![Properties Port Settings](./WinDev03.jpg)
+![Properties Driver](./WinDev04.jpg)
