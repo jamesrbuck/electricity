@@ -35,5 +35,25 @@ I soon realized that I needed to put the values into a database and I could use 
 The script has a main() function that contains the a lot of the code.  main() is used to ensure that the script is run as top-level script.
 
 * if __name__ == '__main__':
-
-blah blah
+  * Get command line arguments with parser
+  * Read confifuration file with config
+  * If script-is-executing file exists, exit
+  * Redirect STDOUT and STDERR to log file
+  * Get config values into script variables
+  * Setup signal handler
+  * Create script-is-executing file
+  * Call main()
+  
+* main():
+  * while True:
+    * If Stop-File exists, exit
+    * Retry loop on call to api.get_instantaneous_demand()
+    * Check if call failed and exit if it did
+    * Get values: demand, divisor, multiplier, kw
+    * Check if we're still in the same hour and add to kWh if so
+    * else write kWh out, stop_serial() and start_serial() to refresh serial connection
+    * Retry loop on start_serial()
+    * Check if it's Midnight and print summary if it is.  Note that this code is obsolete since we're also inserting values into the database.
+    * sleep 60 seconds
+    
+etc
