@@ -35,4 +35,5 @@ I soon realized that I needed to put the values into a database and I could use 
 The script has a main() function that contains the a lot of the code.  main() is used to ensure that the script is run as top-level script.
 
 * if __name__ == '__main__':
+
 blah blah
