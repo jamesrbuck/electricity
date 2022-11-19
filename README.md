@@ -21,18 +21,27 @@ emu-power 1.51: https://pypi.org/project/emu-power/
 
 ### Overview
 
-The EMU-2 reports the instaneous electricity usage when queried.  It returns a value in Kilowatt Hours (kWh) as if that amount was used for a full hour.  I wanted to get a total of electricity used for each whole hour.  I decided to take a reading every minute and add that value to an accumulator.  At the end of the hour, the script divides that amount by the number of readings which is usually 60.  This value is written to a tab-seperated file.  The values are written within an infinite loop.  The script must be externally stopped if desired.
+The EMU-2 reports the instaneous electricity usage when queried.  It returns a value in Kilowatt Hours (kWh) as if that amount was used for a full hour.  I wanted to get a total of electricity used for each whole hour.  I decided to take a reading every minute and add that value to an accumulator.  At the end of the hour, the script divides that amount by the number of readings which is usually 60.  This value is written to a tab-separated file.
 
-### Logic
+### How to Run
 
-I soon realized that I needed to put the values into a database and I could use my SQL skills to query the results in different ways.  The next step was to setup a MySQL database to receive the values.
+The values are written within an infinite loop and the script must be externally stopped (i.e., killed) if desired.  The script can be run from the command line and it will check a file to see if it is already running.  It will stop if there is another instance running.  I created a Windows Scheduled Task in an effort to make the execution of the script as automated as possible.  The ohly trigger event was "System Startup" since the script is always running (but sleep()'ing most of time).  I ran into problems when I tried to added schedule triggers to force the script to start if it somehow failed.  I gave this up since the script is reliable.
+
+![Windows Scheduler](./WindowsScheduledTask.jpg)
+
+### Functions
+
+I soon realized that I needed to put the values into a database.  This allowed me to use my SQL skills to query the results in different ways.  The next step was to setup a MySQL database to receive the values.
 
 * def insertDB(myDate, myHour, mykWh): A self-contained function to insert a record into the database.
 * class MySignalHandler:
   * def setup(self,thePID,theAR): Initialize signal handler and the variables PID and AR
   * def catch(self, signalNumber, frame): Get the current time, set a message and print the message; remove file indicating the script is running; flush STDOUT and STDERR; call os.kill() to kill itself.
-  
-The script has a main() function that contains the a lot of the code.  main() is used to ensure that the script is run as top-level script.
+* def main(): Only runs code if the script is run as a top-level script.
+
+The script has a main() function that contains the most of the code.  main() is used to ensure that the script is run as top-level script.
+
+### Logic
 
 * if __name__ == '__main__':
   * Get command line arguments with parser
@@ -43,7 +52,7 @@ The script has a main() function that contains the a lot of the code.  main() is
   * Setup signal handler
   * Create script-is-executing file
   * Call main()
-  
+
 * main():
   * while True:
     * If Stop-File exists, exit
@@ -55,7 +64,7 @@ The script has a main() function that contains the a lot of the code.  main() is
     * Retry loop on start_serial()
     * Check if it's Midnight and print summary if it is.  Note that this code is obsolete since we're also inserting values into the database.
     * sleep 60 seconds
-    
+
 
 ### Database
 
@@ -65,10 +74,6 @@ The script has a main() function that contains the a lot of the code.  main() is
 create database pse
 
 use pse;
-
-select database();
-show tables;
-
 
 CREATE TABLE `pse`.`usage_e` (
   `ID` INT NOT NULL AUTO_INCREMENT,
