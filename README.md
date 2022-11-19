@@ -127,6 +127,8 @@ order by
 
 ## Windows 11 Hardware View
 
+Note: The COMx value changed occasionally but is always below "Ports (COM & LPT)".
+
 ![Device Manager](./WinDev01.jpg)
 ![Properties General](./WinDev02.jpg)
 ![Properties Port Settings](./WinDev03.jpg)
